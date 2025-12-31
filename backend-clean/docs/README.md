@@ -250,6 +250,32 @@ AI「Repositoryにユーザー取得機能を追加します」
 
 ---
 
+### 6️⃣ [06_testing_strategy.md](./06_testing_strategy.md) ※重要
+**「テスト戦略ガイド」- 現場で使える実践的アプローチ**
+
+```
+📌 こんな人におすすめ:
+- テストの基礎から学びたい人
+- Unit Test、Integration Test、E2E Testの使い分けを知りたい人
+- testcontainers-goでDBを使ったテストを書きたい人
+
+📝 学べること:
+- テストの基礎知識（種類、カバレッジ）
+- テストピラミッドの考え方
+- Clean Architectureでのレイヤー別テスト方針
+  - Domain層: Unit Test（純粋関数）
+  - UseCase層: Unit Test（モック使用）
+  - Controller層: Unit Test（バインド、変換、エラーマッピング）
+  - Repository層: Integration Test（testcontainers-go）
+  - E2E Test: 主要フローの検証
+- testcontainers-goの使い方
+- よくある質問（FAQ）
+
+⏱️ 読む時間: 40分
+```
+
+---
+
 ## 🚀 学習の進め方（推奨）
 
 ```
@@ -276,6 +302,10 @@ AI「Repositoryにユーザー取得機能を追加します」
 ステップ6: ローカル環境で動かしてみる（実践）
   └─ 05_local_setup.md を読む
      Docker Compose、マイグレーション、テストを実行
+
+ステップ7: テスト戦略を理解する（重要）
+  └─ 06_testing_strategy.md を読む
+     テストピラミッド、レイヤー別テスト、testcontainers-goを学ぶ
 ```
 
 ---
