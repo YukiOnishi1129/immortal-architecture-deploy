@@ -122,6 +122,7 @@ func toDomainAccount(a *Account) (*account.Account, error) {
 		Email:             email,
 		FirstName:         a.FirstName,
 		LastName:          a.LastName,
+		IsActive:          a.IsActive,
 		Provider:          a.Provider,
 		ProviderAccountID: a.ProviderAccountID,
 		Thumbnail:         thumbnail,

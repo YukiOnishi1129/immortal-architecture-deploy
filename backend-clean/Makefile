@@ -63,6 +63,21 @@ test-run:
 	@test -n "$(RUN)" || (echo "RUN is required, e.g. make test-run PKG=./internal/domain/note RUN=TestValidateNoteForCreate"; exit 1)
 	@GOCACHE=$(GOCACHE) GOMODCACHE=$(GOMODCACHE) $(GO_TEST) $(TEST_FLAGS) -run $(RUN) $(PKG)
 
+# Run unit tests only (skip integration and e2e tests)
+.PHONY: test-unit
+test-unit:
+	@GOCACHE=$(GOCACHE) GOMODCACHE=$(GOMODCACHE) $(GO_TEST) -short $(TEST_FLAGS) ./...
+
+# Run integration tests (repository layer with testcontainers-go)
+.PHONY: test-integration
+test-integration:
+	@GOCACHE=$(GOCACHE) GOMODCACHE=$(GOMODCACHE) $(GO_TEST) $(TEST_FLAGS) -tags=integration ./internal/adapter/gateway/...
+
+# Run E2E tests (full API with testcontainers-go)
+.PHONY: test-e2e
+test-e2e:
+	@GOCACHE=$(GOCACHE) GOMODCACHE=$(GOMODCACHE) $(GO_TEST) $(TEST_FLAGS) -tags=e2e ./tests/e2e/...
+
 .PHONY: sqlc
 sqlc:
 	@sqlc generate

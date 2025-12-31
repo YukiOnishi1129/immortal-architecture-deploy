@@ -276,6 +276,63 @@ AI「Repositoryにユーザー取得機能を追加します」
 
 ---
 
+### 7️⃣ [07_test_cases.md](./07_test_cases.md) ※参照用
+**「テストケース一覧」- 実装済みテストの観点とケース**
+
+```
+📌 こんな人におすすめ:
+- 実装済みのテストケースを確認したい人
+- テストケースの設計ポイントを学びたい人
+- Integration TestやE2E Testの具体例を見たい人
+
+📝 学べること:
+- Integration Test（Repository層）のテストケース一覧
+  - NoteRepository: CRUD、フィルタリング、セクション、エラー、DB制約
+  - TemplateRepository: CRUD、フィールド、isUsedフラグ
+  - AccountRepository: CRUD、UNIQUE制約、UPSERT動作
+- E2E Test（API全体）のテストケース一覧
+  - Note API: CRUD、Publish/Unpublish、エラー、フィルタリング
+  - Template API: CRUD、エラー、フィルタリング
+- テストケース設計のポイント
+  - 正常系と異常系のバランス
+  - テストの独立性
+  - サブテストの活用
+  - デバッグしやすいアサーション
+
+⏱️ 読む時間: 15分
+```
+
+---
+
+### 8️⃣ [08_ci_pipeline.md](./08_ci_pipeline.md) ※運用
+**「CI/CD パイプラインガイド」- GitHub Actions の構成と各ジョブの役割**
+
+```
+📌 こんな人におすすめ:
+- CI パイプラインの全体像を理解したい人
+- 各ジョブがなぜその順序で実行されるか知りたい人
+- ローカルで CI と同じチェックを実行したい人
+
+📝 学べること:
+- パイプラインの全体像（図解）
+- ジョブ構成と実行順序
+  - 並列: lint, unit-test, build
+  - 順次: unit-test → integration-test → e2e-test
+- 各ジョブの詳細と役割
+  - lint: golangci-lint + sqlc generate
+  - unit-test: ドメイン・UseCase・Controller
+  - build: コンパイルエラー検出
+  - integration-test: Repository層（testcontainers）
+  - e2e-test: API全体（testcontainers + httptest）
+- トリガー条件（paths フィルタ）
+- ローカルでの事前確認コマンド
+- FAQ
+
+⏱️ 読む時間: 10分
+```
+
+---
+
 ## 🚀 学習の進め方（推奨）
 
 ```
@@ -306,6 +363,14 @@ AI「Repositoryにユーザー取得機能を追加します」
 ステップ7: テスト戦略を理解する（重要）
   └─ 06_testing_strategy.md を読む
      テストピラミッド、レイヤー別テスト、testcontainers-goを学ぶ
+
+ステップ8: テストケース一覧を確認する（参照用）
+  └─ 07_test_cases.md を読む
+     実装済みのテストケース一覧と設計ポイントを確認
+
+ステップ9: CIパイプラインを理解する（運用）
+  └─ 08_ci_pipeline.md を読む
+     GitHub Actionsのジョブ構成と実行順序を理解
 ```
 
 ---
