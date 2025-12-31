@@ -745,21 +745,30 @@ func StartTestServer(t *testing.T, dbConnStr string) *httptest.Server {
 ### ⚡ 実行方法
 
 ```bash
-# 全テスト実行
-go test ./...
+# Unit Testのみ（高速、Docker不要）
+make test-unit
 
-# Unit Testのみ（高速）
-go test -short ./...
+# Integration Test（testcontainers-go使用、Docker必須）
+make test-integration
 
-# Integration Test含む
-go test ./...
+# E2E Test（testcontainers-go使用、Docker必須）
+make test-e2e
+
+# 特定パッケージのテストを実行
+make test-pkg PKG=./internal/domain/note
 
 # 特定のテストを実行
-go test -run TestNoteRepository_Integration ./internal/adapter/gateway/db/sqlc/
+make test-run PKG=./internal/domain/note RUN=TestValidateNoteForCreate
 
-# E2Eテストのみ
-go test ./tests/e2e/...
+# 全テスト実行（Unit + Integration + E2E）
+# ※ Dockerが必要
+go test -tags=integration,e2e ./...
 ```
+
+**補足:**
+- `make test-unit`: モックを使ったUnit Testのみ（高速、Docker不要）
+- `make test-integration`: Repository層のIntegration Test（Docker必須）
+- `make test-e2e`: API全体のE2E Test（Docker必須）
 
 ---
 
