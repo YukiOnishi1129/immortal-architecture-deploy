@@ -304,6 +304,35 @@ AI「Repositoryにユーザー取得機能を追加します」
 
 ---
 
+### 8️⃣ [08_ci_pipeline.md](./08_ci_pipeline.md) ※運用
+**「CI/CD パイプラインガイド」- GitHub Actions の構成と各ジョブの役割**
+
+```
+📌 こんな人におすすめ:
+- CI パイプラインの全体像を理解したい人
+- 各ジョブがなぜその順序で実行されるか知りたい人
+- ローカルで CI と同じチェックを実行したい人
+
+📝 学べること:
+- パイプラインの全体像（図解）
+- ジョブ構成と実行順序
+  - 並列: lint, unit-test, build
+  - 順次: unit-test → integration-test → e2e-test
+- 各ジョブの詳細と役割
+  - lint: golangci-lint + sqlc generate
+  - unit-test: ドメイン・UseCase・Controller
+  - build: コンパイルエラー検出
+  - integration-test: Repository層（testcontainers）
+  - e2e-test: API全体（testcontainers + httptest）
+- トリガー条件（paths フィルタ）
+- ローカルでの事前確認コマンド
+- FAQ
+
+⏱️ 読む時間: 10分
+```
+
+---
+
 ## 🚀 学習の進め方（推奨）
 
 ```
@@ -338,6 +367,10 @@ AI「Repositoryにユーザー取得機能を追加します」
 ステップ8: テストケース一覧を確認する（参照用）
   └─ 07_test_cases.md を読む
      実装済みのテストケース一覧と設計ポイントを確認
+
+ステップ9: CIパイプラインを理解する（運用）
+  └─ 08_ci_pipeline.md を読む
+     GitHub Actionsのジョブ構成と実行順序を理解
 ```
 
 ---

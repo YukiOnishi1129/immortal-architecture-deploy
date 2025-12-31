@@ -15,7 +15,7 @@ on:
       - ".github/workflows/backend-ci.yml"
 
 jobs:
-  lint-and-build:
+  lint:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -31,9 +31,59 @@ jobs:
           go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.63.4
       - name: Lint
         run: make lint
-      - name: Test
-        run: make test
       - name: Generate sqlc
         run: make sqlc
+
+  unit-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend-clean
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.1"
+      - name: Unit Test
+        run: make test-unit
+
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend-clean
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.1"
       - name: Build
         run: make build
+
+  integration-test:
+    needs: unit-test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend-clean
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.1"
+      - name: Integration Test
+        run: make test-integration
+
+  e2e-test:
+    needs: integration-test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend-clean
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.1"
+      - name: E2E Test
+        run: make test-e2e
