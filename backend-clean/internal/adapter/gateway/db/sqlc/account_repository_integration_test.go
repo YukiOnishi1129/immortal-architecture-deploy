@@ -4,7 +4,6 @@
 package sqlc
 
 import (
-	"context"
 	"errors"
 	"testing"
 
@@ -25,7 +24,7 @@ func TestAccountRepository_Integration_UpsertOAuthAccount(t *testing.T) {
 	pg := testutil.SetupPostgres(t)
 	pool := pg.NewPool(t)
 	repo := NewAccountRepository(pool)
-	ctx := context.Background()
+	ctx := testutil.TestContext(t)
 
 	t.Run("Create new account", func(t *testing.T) {
 		input := account.OAuthAccountInput{
@@ -99,7 +98,7 @@ func TestAccountRepository_Integration_GetByID(t *testing.T) {
 	pg := testutil.SetupPostgres(t)
 	pool := pg.NewPool(t)
 	repo := NewAccountRepository(pool)
-	ctx := context.Background()
+	ctx := testutil.TestContext(t)
 
 	// Create test account
 	testAcc := testutil.CreateTestAccount(t, pool, testutil.TestAccount{
@@ -136,7 +135,7 @@ func TestAccountRepository_Integration_GetByEmail(t *testing.T) {
 	pg := testutil.SetupPostgres(t)
 	pool := pg.NewPool(t)
 	repo := NewAccountRepository(pool)
-	ctx := context.Background()
+	ctx := testutil.TestContext(t)
 
 	// Create test account
 	testAcc := testutil.CreateTestAccount(t, pool, testutil.TestAccount{
@@ -166,7 +165,7 @@ func TestAccountRepository_Integration_Constraints(t *testing.T) {
 	pg := testutil.SetupPostgres(t)
 	pool := pg.NewPool(t)
 	repo := NewAccountRepository(pool)
-	ctx := context.Background()
+	ctx := testutil.TestContext(t)
 
 	t.Run("Email uniqueness constraint", func(t *testing.T) {
 		email := "unique-test@example.com"

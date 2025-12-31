@@ -4,7 +4,6 @@
 package sqlc
 
 import (
-	"context"
 	"errors"
 	"testing"
 
@@ -31,7 +30,7 @@ func TestNoteRepository_Integration_CRUD(t *testing.T) {
 
 	// Create repository
 	repo := NewNoteRepository(pool)
-	ctx := context.Background()
+	ctx := testutil.TestContext(t)
 
 	t.Run("Get existing note", func(t *testing.T) {
 		got, err := repo.Get(ctx, data.Note.ID)
@@ -131,10 +130,10 @@ func TestNoteRepository_Integration_List(t *testing.T) {
 	pool := pg.NewPool(t)
 	data := testutil.CreateDefaultTestData(t, pool)
 	repo := NewNoteRepository(pool)
-	ctx := context.Background()
+	ctx := testutil.TestContext(t)
 
-	// Create additional notes for filtering tests
-	publishedNote := testutil.CreateTestNote(t, pool, testutil.TestNote{
+	// Create additional note with Publish status for filtering tests
+	testutil.CreateTestNote(t, pool, testutil.TestNote{
 		Title:      "Published Note",
 		TemplateID: data.Template.ID,
 		OwnerID:    data.Account.ID,
@@ -166,7 +165,6 @@ func TestNoteRepository_Integration_List(t *testing.T) {
 		for _, n := range notes {
 			assert.Equal(t, note.StatusPublish, n.Note.Status)
 		}
-		_ = publishedNote // use variable
 	})
 
 	t.Run("List by owner", func(t *testing.T) {
@@ -206,7 +204,7 @@ func TestNoteRepository_Integration_Sections(t *testing.T) {
 	pool := pg.NewPool(t)
 	data := testutil.CreateDefaultTestData(t, pool)
 	repo := NewNoteRepository(pool)
-	ctx := context.Background()
+	ctx := testutil.TestContext(t)
 
 	t.Run("Get note with sections", func(t *testing.T) {
 		got, err := repo.Get(ctx, data.Note.ID)
@@ -261,7 +259,7 @@ func TestNoteRepository_Integration_Constraints(t *testing.T) {
 	pool := pg.NewPool(t)
 	data := testutil.CreateDefaultTestData(t, pool)
 	repo := NewNoteRepository(pool)
-	ctx := context.Background()
+	ctx := testutil.TestContext(t)
 
 	t.Run("Create note with invalid template ID fails", func(t *testing.T) {
 		newNote := note.Note{

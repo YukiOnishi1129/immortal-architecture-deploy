@@ -153,8 +153,9 @@ func TestTemplateAPI_CRUD(t *testing.T) {
 		require.NoError(t, err)
 
 		var created map[string]interface{}
-		json.NewDecoder(createResp.Body).Decode(&created)
+		err = json.NewDecoder(createResp.Body).Decode(&created)
 		createResp.Body.Close()
+		require.NoError(t, err)
 		templateToDelete := created["id"].(string)
 
 		// Delete it

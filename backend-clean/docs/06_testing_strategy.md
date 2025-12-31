@@ -509,8 +509,8 @@ func TestNoteRepository_Integration(t *testing.T) {
     }
 
     // PostgreSQLコンテナ起動
-    ctx := context.Background()
     pg := testutil.SetupPostgres(t)
+    ctx := testutil.TestContext(t) // テストのタイムアウトを尊重するコンテキスト
 
     // Repository作成
     pool, _ := pgxpool.New(ctx, pg.ConnectionString)
@@ -941,7 +941,7 @@ type PostgresContainer struct {
 
 func SetupPostgres(t *testing.T) *PostgresContainer {
     t.Helper()
-    ctx := context.Background()
+    ctx := context.Background() // コンテナ起動はテストタイムアウトと独立
 
     // PostgreSQLコンテナ起動
     pgContainer, err := postgres.Run(ctx,
@@ -995,6 +995,19 @@ func runMigrations(connStr string) error {
     }
     return nil
 }
+
+// TestContext はテストのタイムアウトを尊重するコンテキストを作成する。
+// テストに -timeout フラグが指定されている場合、そのデッドラインで
+// コンテキストがキャンセルされ、DB操作がハングするのを防ぐ。
+func TestContext(t *testing.T) context.Context {
+    t.Helper()
+    ctx, cancel := context.WithCancel(context.Background())
+    if deadline, ok := t.Deadline(); ok {
+        ctx, cancel = context.WithDeadline(context.Background(), deadline)
+    }
+    t.Cleanup(cancel)
+    return ctx
+}
 ```
 
 ### 🚀 テストサーバー起動
@@ -1004,18 +1017,19 @@ func runMigrations(connStr string) error {
 package testutil
 
 import (
-    "context"
     "net/http/httptest"
     "testing"
 
     "immortal-architecture-clean/backend/internal/driver/initializer/api"
+    basetestutil "immortal-architecture-clean/backend/tests/testutil"
 )
 
 func StartTestServer(t *testing.T, dbConnStr string) *httptest.Server {
     t.Helper()
+    ctx := basetestutil.TestContext(t)
 
     // テスト用の設定でサーバー構築
-    e, cleanup, err := api.BuildServerWithDB(context.Background(), dbConnStr)
+    e, cleanup, err := api.BuildServerWithDB(ctx, dbConnStr)
     if err != nil {
         t.Fatalf("failed to build server: %v", err)
     }

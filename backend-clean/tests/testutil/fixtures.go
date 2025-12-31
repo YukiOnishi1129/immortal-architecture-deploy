@@ -3,6 +3,7 @@ package testutil
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/google/uuid"
@@ -108,7 +109,7 @@ func CreateTestTemplate(t *testing.T, pool *pgxpool.Pool, template TestTemplate)
 			template.Fields[i].Order = i + 1
 		}
 		if template.Fields[i].Label == "" {
-			template.Fields[i].Label = "Field " + string(rune('A'+i))
+			template.Fields[i].Label = fmt.Sprintf("Field %d", i+1)
 		}
 
 		_, err := pool.Exec(ctx, `

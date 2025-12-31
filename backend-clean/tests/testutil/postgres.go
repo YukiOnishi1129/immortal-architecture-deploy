@@ -148,3 +148,17 @@ func (c *PostgresContainer) CleanupTables(t *testing.T, pool *pgxpool.Pool) {
 		}
 	}
 }
+
+// TestContext creates a context that respects the test's deadline.
+// If the test has a deadline (e.g., from -timeout flag), the context
+// will be canceled when the deadline is reached, preventing tests
+// from hanging indefinitely.
+func TestContext(t *testing.T) context.Context {
+	t.Helper()
+	ctx, cancel := context.WithCancel(context.Background())
+	if deadline, ok := t.Deadline(); ok {
+		ctx, cancel = context.WithDeadline(context.Background(), deadline)
+	}
+	t.Cleanup(cancel)
+	return ctx
+}

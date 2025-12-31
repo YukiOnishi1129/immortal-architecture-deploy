@@ -4,7 +4,6 @@
 package sqlc
 
 import (
-	"context"
 	"errors"
 	"testing"
 
@@ -31,7 +30,7 @@ func TestTemplateRepository_Integration_CRUD(t *testing.T) {
 	})
 
 	repo := NewTemplateRepository(pool)
-	ctx := context.Background()
+	ctx := testutil.TestContext(t)
 
 	var createdID string
 
@@ -109,7 +108,7 @@ func TestTemplateRepository_Integration_Fields(t *testing.T) {
 
 	account := testutil.CreateTestAccount(t, pool, testutil.TestAccount{})
 	repo := NewTemplateRepository(pool)
-	ctx := context.Background()
+	ctx := testutil.TestContext(t)
 
 	// Create template
 	tpl := template.Template{
@@ -177,7 +176,7 @@ func TestTemplateRepository_Integration_List(t *testing.T) {
 	account2 := testutil.CreateTestAccount(t, pool, testutil.TestAccount{FirstName: "User2"})
 
 	repo := NewTemplateRepository(pool)
-	ctx := context.Background()
+	ctx := testutil.TestContext(t)
 
 	// Create templates for account1
 	tpl1, err := repo.Create(ctx, template.Template{Name: "Design Doc", OwnerID: account1.ID})
@@ -236,7 +235,7 @@ func TestTemplateRepository_Integration_Constraints(t *testing.T) {
 	pool := pg.NewPool(t)
 
 	repo := NewTemplateRepository(pool)
-	ctx := context.Background()
+	ctx := testutil.TestContext(t)
 
 	t.Run("Create template with invalid owner fails", func(t *testing.T) {
 		tpl := template.Template{

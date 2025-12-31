@@ -103,8 +103,9 @@ func TestNoteAPI_CRUD(t *testing.T) {
 		getResp, err := http.Get(server.URL + "/api/notes/" + createdNoteID)
 		require.NoError(t, err)
 		var noteData map[string]interface{}
-		json.NewDecoder(getResp.Body).Decode(&noteData)
+		err = json.NewDecoder(getResp.Body).Decode(&noteData)
 		getResp.Body.Close()
+		require.NoError(t, err)
 
 		sections := noteData["sections"].([]interface{})
 		updatedSections := make([]map[string]interface{}, len(sections))

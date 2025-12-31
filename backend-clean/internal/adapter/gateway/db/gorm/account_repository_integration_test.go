@@ -3,7 +3,6 @@
 package gorm
 
 import (
-	"context"
 	"testing"
 
 	"github.com/google/uuid"
@@ -34,7 +33,7 @@ func TestAccountRepository_Gorm_Integration_UpsertOAuthAccount(t *testing.T) {
 	pg := testutil.SetupPostgres(t)
 	db := setupGormDB(t, pg.ConnectionString)
 	repo := NewAccountRepository(db)
-	ctx := context.Background()
+	ctx := testutil.TestContext(t)
 
 	t.Run("Create new account", func(t *testing.T) {
 		input := account.OAuthAccountInput{
@@ -113,7 +112,7 @@ func TestAccountRepository_Gorm_Integration_GetByID(t *testing.T) {
 	pg := testutil.SetupPostgres(t)
 	db := setupGormDB(t, pg.ConnectionString)
 	repo := NewAccountRepository(db)
-	ctx := context.Background()
+	ctx := testutil.TestContext(t)
 
 	// Create test account
 	input := account.OAuthAccountInput{
@@ -151,7 +150,7 @@ func TestAccountRepository_Gorm_Integration_GetByEmail(t *testing.T) {
 	pg := testutil.SetupPostgres(t)
 	db := setupGormDB(t, pg.ConnectionString)
 	repo := NewAccountRepository(db)
-	ctx := context.Background()
+	ctx := testutil.TestContext(t)
 
 	// Create test account
 	email := "gorm-getbyemail@example.com"

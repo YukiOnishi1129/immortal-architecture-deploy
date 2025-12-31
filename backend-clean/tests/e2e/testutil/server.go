@@ -4,7 +4,6 @@
 package testutil
 
 import (
-	"context"
 	"net/http/httptest"
 	"testing"
 
@@ -16,6 +15,7 @@ import (
 	driverdb "immortal-architecture-clean/backend/internal/driver/db"
 	"immortal-architecture-clean/backend/internal/driver/factory"
 	httpfactory "immortal-architecture-clean/backend/internal/driver/factory/http"
+	basetestutil "immortal-architecture-clean/backend/tests/testutil"
 )
 
 // TestServer wraps httptest.Server with helper methods.
@@ -27,7 +27,7 @@ type TestServer struct {
 // StartTestServer creates and starts a test server with the given database connection.
 func StartTestServer(t *testing.T, connStr string) *TestServer {
 	t.Helper()
-	ctx := context.Background()
+	ctx := basetestutil.TestContext(t)
 
 	// Create database pool
 	pool, err := pgxpool.New(ctx, connStr)
