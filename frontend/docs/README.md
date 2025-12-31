@@ -39,6 +39,21 @@
    - コーディング規約
    - デバッグテクニック
 
+8. **[認証ガイド](./08_authentication.md)**
+   - Better Auth設定
+   - 認証フロー
+   - セッション管理
+
+9. **[テスト戦略](./09_testing_strategy.md)**
+   - フロントエンドテストの考え方
+   - カスタムフックのテスト
+   - E2Eテスト（Playwright + MSW）
+
+10. **[BFFテスト戦略](./10_bff_testing_strategy.md)**
+    - BFF（Backend for Frontend）の責務
+    - DTO / Zod スキーマのテスト
+    - Service / Handler のテスト
+
 ## クイックスタート
 
 新しい機能を実装する場合は、以下の順序でドキュメントを参照してください：
