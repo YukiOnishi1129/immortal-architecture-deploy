@@ -1,0 +1,94 @@
+# =============================================================================
+# Cloud Build configuration for Frontend (Next.js)
+# =============================================================================
+# このファイルは Cloud Build トリガーから実行されます
+#
+# トリガー設定:
+#   - イベント: main ブランチへの push
+#   - フィルタ: frontend/** の変更時のみ
+#   - 代入変数: _NEXT_PUBLIC_APP_URL を設定
+#
+# 必要な Secret Manager シークレット:
+#   - DATABASE_URL: Neon PostgreSQL 接続文字列
+#   - BETTER_AUTH_SECRET: Better Auth のシークレットキー
+#   - GOOGLE_CLIENT_ID: Google OAuth クライアントID
+#   - GOOGLE_CLIENT_SECRET: Google OAuth クライアントシークレット
+# =============================================================================
+
+steps:
+  # -------------------------------------------------------------------------
+  # Step 1: Docker イメージをビルド
+  # -------------------------------------------------------------------------
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/frontend:${SHORT_SHA}'
+      - '-t'
+      - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/frontend:latest'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_APP_URL=${_NEXT_PUBLIC_APP_URL}'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+    dir: 'frontend'
+
+  # -------------------------------------------------------------------------
+  # Step 2: イメージを Artifact Registry にプッシュ
+  # -------------------------------------------------------------------------
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/frontend:${SHORT_SHA}'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/frontend:latest'
+
+  # -------------------------------------------------------------------------
+  # Step 3: Cloud Run にデプロイ
+  # -------------------------------------------------------------------------
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'frontend'
+      - '--image'
+      - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/frontend:${SHORT_SHA}'
+      - '--region'
+      - 'asia-northeast1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '3000'
+      - '--memory'
+      - '512Mi'
+      - '--cpu'
+      - '1'
+      - '--min-instances'
+      - '0'
+      - '--max-instances'
+      - '10'
+      - '--set-secrets'
+      - 'DATABASE_URL=DATABASE_URL:latest,BETTER_AUTH_SECRET=BETTER_AUTH_SECRET:latest,GOOGLE_CLIENT_ID=GOOGLE_CLIENT_ID:latest,GOOGLE_CLIENT_SECRET=GOOGLE_CLIENT_SECRET:latest'
+      - '--set-env-vars'
+      - 'NEXT_PUBLIC_APP_URL=${_NEXT_PUBLIC_APP_URL},BETTER_AUTH_URL=${_NEXT_PUBLIC_APP_URL}'
+
+# ビルドに使用するイメージを保存
+images:
+  - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/frontend:${SHORT_SHA}'
+  - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/frontend:latest'
+
+# 置換変数 (トリガーの設定で上書きされる)
+substitutions:
+  _NEXT_PUBLIC_APP_URL: 'https://frontend-xxxxx.asia-northeast1.run.app'
+
+# タイムアウト設定 (20分 - Next.js ビルドは時間がかかる)
+timeout: '1200s'
+
+# ビルドオプション
+options:
+  logging: CLOUD_LOGGING_ONLY

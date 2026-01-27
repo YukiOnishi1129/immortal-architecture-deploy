@@ -1,0 +1,83 @@
+# =============================================================================
+# Cloud Build configuration for Backend (Go API)
+# =============================================================================
+# このファイルは Cloud Build トリガーから実行されます
+#
+# トリガー設定:
+#   - イベント: main ブランチへの push
+#   - フィルタ: backend-clean/** の変更時のみ
+#
+# 必要な Secret Manager シークレット:
+#   - DATABASE_URL: Neon PostgreSQL 接続文字列
+#   - CLIENT_ORIGIN: Frontend の URL (CORS設定用)
+# =============================================================================
+
+steps:
+  # -------------------------------------------------------------------------
+  # Step 1: Docker イメージをビルド
+  # -------------------------------------------------------------------------
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/backend:${SHORT_SHA}'
+      - '-t'
+      - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/backend:latest'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+    dir: 'backend-clean'
+
+  # -------------------------------------------------------------------------
+  # Step 2: イメージを Artifact Registry にプッシュ
+  # -------------------------------------------------------------------------
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/backend:${SHORT_SHA}'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/backend:latest'
+
+  # -------------------------------------------------------------------------
+  # Step 3: Cloud Run にデプロイ
+  # -------------------------------------------------------------------------
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'backend'
+      - '--image'
+      - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/backend:${SHORT_SHA}'
+      - '--region'
+      - 'asia-northeast1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '8080'
+      - '--memory'
+      - '512Mi'
+      - '--cpu'
+      - '1'
+      - '--min-instances'
+      - '0'
+      - '--max-instances'
+      - '10'
+      - '--set-secrets'
+      - 'DATABASE_URL=DATABASE_URL:latest,CLIENT_ORIGIN=CLIENT_ORIGIN:latest'
+
+# ビルドに使用するイメージを保存
+images:
+  - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/backend:${SHORT_SHA}'
+  - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/backend:latest'
+
+# タイムアウト設定 (15分)
+timeout: '900s'
+
+# ビルドオプション
+options:
+  logging: CLOUD_LOGGING_ONLY
