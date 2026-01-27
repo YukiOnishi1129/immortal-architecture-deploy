@@ -118,7 +118,9 @@ postgresql://username:password@ep-xxxxx.ap-southeast-1.aws.neon.tech/neondb?sslm
 
 ## Step 2: Migration の実行
 
-データベースにテーブルを作成します。Migration は GitHub Actions で自動実行されます。
+データベースにテーブルを作成します。初回セットアップ時に一度だけ実行します。
+
+> **注意**: Migration は新しいテーブルやカラムを追加するときのみ実行します。通常の開発・デプロイでは実行不要です。
 
 ### 2-1. GitHub Secrets に DATABASE_URL を設定
 
@@ -141,7 +143,7 @@ postgresql://username:password@ep-xxxxx.ap-southeast-1.aws.neon.tech/neondb?sslm
 1. GitHub のリポジトリページで「Actions」タブをクリック
 2. 左メニューから「Database Migration」を選択
 3. 「Run workflow」をクリック
-4. Target を `all` のまま「Run workflow」をクリック
+4. 「Run workflow」をクリック
 5. 実行が完了するまで待つ（緑色のチェックマークが表示されれば成功）
 
 > **確認**: Neon のダッシュボードでテーブルが作成されていることを確認できます。
