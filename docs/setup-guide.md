@@ -209,6 +209,18 @@ Cloud Run などを使うには課金の有効化が必要です（無料枠内�
 
 Secret Manager は、パスワードや API キーなどの機密情報を安全に保存するサービスです。
 
+### Secret Manager に入れるもの・入れないもの
+
+| 種類 | 例 | Secret Manager |
+|-----|-----|:---:|
+| パスワード・接続文字列 | `DATABASE_URL` | ✅ 必要 |
+| API シークレットキー | `BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_SECRET` | ✅ 必要 |
+| OAuth クライアント ID | `GOOGLE_CLIENT_ID` | ✅ 必要 |
+| 公開 URL | `NEXT_PUBLIC_APP_URL`, `API_BASE_URL` | ❌ 不要 |
+| 設定値（数値・フラグ） | `PORT`, `NODE_ENV` | ❌ 不要 |
+
+> **ポイント**: Secret Manager は**漏洩すると危険な情報**を保存する場所です。公開 URL やポート番号など、漏れても問題ない値は環境変数で十分です。
+
 ### 4-1. Secret Manager を開く
 
 1. 左メニュー →「セキュリティ」→「Secret Manager」
