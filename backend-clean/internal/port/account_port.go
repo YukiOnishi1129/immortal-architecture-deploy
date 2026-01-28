@@ -3,6 +3,7 @@ package port
 
 import (
 	"context"
+	"time"
 
 	"immortal-architecture-clean/backend/internal/domain/account"
 )
@@ -24,4 +25,7 @@ type AccountRepository interface {
 	UpsertOAuthAccount(ctx context.Context, input account.OAuthAccountInput) (*account.Account, error)
 	GetByID(ctx context.Context, id string) (*account.Account, error)
 	GetByEmail(ctx context.Context, email string) (*account.Account, error)
+	// DeactivateByLastLoginBefore deactivates active users who last logged in before the given time.
+	// Returns the number of affected rows.
+	DeactivateByLastLoginBefore(ctx context.Context, before time.Time) (int, error)
 }

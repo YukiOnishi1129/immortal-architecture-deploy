@@ -3,6 +3,7 @@ package gorm
 import (
 	"context"
 	"errors"
+	"time"
 
 	"gorm.io/gorm"
 
@@ -103,6 +104,23 @@ func (r *AccountRepository) GetByEmail(ctx context.Context, emailAddr string) (*
 	}
 
 	return toDomainAccount(&dbAccount)
+}
+
+// DeactivateByLastLoginBefore deactivates active users who last logged in before the given time.
+func (r *AccountRepository) DeactivateByLastLoginBefore(ctx context.Context, before time.Time) (int, error) {
+	result := r.db.WithContext(ctx).
+		Model(&Account{}).
+		Where("last_login_at < ? AND is_active = ?", before, true).
+		Updates(map[string]interface{}{
+			"is_active":  false,
+			"updated_at": time.Now(),
+		})
+
+	if result.Error != nil {
+		return 0, result.Error
+	}
+
+	return int(result.RowsAffected), nil
 }
 
 // toDomainAccount converts GORM model to domain model.

@@ -4,5 +4,6 @@
 .tools
 migrate
 main
+/job
 
 /bin/grpc

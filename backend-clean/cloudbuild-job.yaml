@@ -1,0 +1,74 @@
+# =============================================================================
+# Cloud Build configuration for Job (Cloud Run Jobs)
+# =============================================================================
+# このファイルは Cloud Build トリガーから実行されます
+#
+# トリガー設定:
+#   - イベント: main ブランチへの push
+#   - フィルタ: backend-clean/** の変更時のみ
+#
+# 必要な Secret Manager シークレット:
+#   - DATABASE_URL: Neon PostgreSQL 接続文字列
+# =============================================================================
+
+steps:
+  # -------------------------------------------------------------------------
+  # Step 1: Docker イメージをビルド
+  # -------------------------------------------------------------------------
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/job:${SHORT_SHA}'
+      - '-t'
+      - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/job:latest'
+      - '-f'
+      - 'Dockerfile.job'
+      - '.'
+    dir: 'backend-clean'
+
+  # -------------------------------------------------------------------------
+  # Step 2: イメージを Artifact Registry にプッシュ
+  # -------------------------------------------------------------------------
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/job:${SHORT_SHA}'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/job:latest'
+
+  # -------------------------------------------------------------------------
+  # Step 3: Cloud Run Jobs にデプロイ
+  # -------------------------------------------------------------------------
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'jobs'
+      - 'deploy'
+      - 'deactivate-inactive-users'
+      - '--image'
+      - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/job:${SHORT_SHA}'
+      - '--region'
+      - 'asia-northeast1'
+      - '--set-secrets'
+      - 'DATABASE_URL=DATABASE_URL:latest'
+      - '--max-retries'
+      - '3'
+      - '--task-timeout'
+      - '300s'
+
+# ビルドに使用するイメージを保存
+images:
+  - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/job:${SHORT_SHA}'
+  - 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/cloud-run-repo/job:latest'
+
+# タイムアウト設定 (10分)
+timeout: '600s'
+
+# ビルドオプション
+options:
+  logging: CLOUD_LOGGING_ONLY
