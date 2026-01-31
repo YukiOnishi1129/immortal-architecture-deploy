@@ -77,6 +77,23 @@ func (r *AccountRepository) GetByEmail(ctx context.Context, email string) (*acco
 	return toDomainAccount(row)
 }
 
+// DeactivateByLastLoginBefore deactivates active users who last logged in before the given time.
+func (r *AccountRepository) DeactivateByLastLoginBefore(ctx context.Context, before time.Time) (int, error) {
+	query := `
+		UPDATE accounts
+		SET is_active = false, updated_at = NOW()
+		WHERE last_login_at < $1
+		  AND is_active = true
+	`
+
+	result, err := r.pool.Exec(ctx, query, before)
+	if err != nil {
+		return 0, err
+	}
+
+	return int(result.RowsAffected()), nil
+}
+
 func toDomainAccount(a *generated.Account) (*account.Account, error) {
 	var lastLogin *time.Time
 	if a.LastLoginAt.Valid {

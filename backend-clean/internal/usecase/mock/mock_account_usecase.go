@@ -3,6 +3,7 @@ package mockusecase
 import (
 	"context"
 	"reflect"
+	"time"
 
 	"github.com/golang/mock/gomock"
 
@@ -69,6 +70,19 @@ func (m *MockAccountRepository) GetByEmail(ctx context.Context, email string) (*
 func (mr *MockAccountRepositoryMockRecorder) GetByEmail(ctx, email any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByEmail", reflect.TypeOf((*MockAccountRepository)(nil).GetByEmail), ctx, email)
+}
+
+func (m *MockAccountRepository) DeactivateByLastLoginBefore(ctx context.Context, before time.Time) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeactivateByLastLoginBefore", ctx, before)
+	res0, _ := ret[0].(int)
+	res1, _ := ret[1].(error)
+	return res0, res1
+}
+
+func (mr *MockAccountRepositoryMockRecorder) DeactivateByLastLoginBefore(ctx, before any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeactivateByLastLoginBefore", reflect.TypeOf((*MockAccountRepository)(nil).DeactivateByLastLoginBefore), ctx, before)
 }
 
 // MockAccountOutputPort is a mock of port.AccountOutputPort.

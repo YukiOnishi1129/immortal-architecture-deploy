@@ -26,3 +26,10 @@ func NewNoteInputFactory() func(noteRepo port.NoteRepository, tplRepo port.Templ
 		return usecase.NewNoteInteractor(noteRepo, tplRepo, tx, output)
 	}
 }
+
+// NewDeactivateJobInputFactory returns a factory for DeactivateInteractor.
+func NewDeactivateJobInputFactory() func(repo port.AccountRepository, output port.DeactivateJobOutputPort) port.DeactivateJobInputPort {
+	return func(repo port.AccountRepository, output port.DeactivateJobOutputPort) port.DeactivateJobInputPort {
+		return usecase.NewDeactivateInteractor(repo, output)
+	}
+}
